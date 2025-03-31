@@ -1,4 +1,7 @@
-fastAPI
-pydantic
-psycopg2
 bcrypt
+fastAPI
+psycopg2
+pydantic
+python-dotenv
+sqlalchemy
+uvicorn
