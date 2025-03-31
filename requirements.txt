@@ -1,3 +1,4 @@
+alembic
 bcrypt
 fastAPI
 psycopg2
