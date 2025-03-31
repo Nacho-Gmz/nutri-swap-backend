@@ -1,0 +1,4 @@
+fastAPI
+pydantic
+psycopg2
+bcrypt
