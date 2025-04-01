@@ -1,12 +1,11 @@
 from pydantic import ConfigDict, BaseModel, EmailStr
-from typing import Optional
 
 
 class UsuarioBase(BaseModel):
     nombre: str
     apellidos: str
     email: EmailStr
-    active: bool = True
+    activo: bool = True
 
 
 class UsuarioCreate(UsuarioBase):
