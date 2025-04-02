@@ -1,6 +1,7 @@
 alembic
 bcrypt
 fastAPI
+python-jose[cryptography]
 psycopg2
 pydantic
 python-dotenv
