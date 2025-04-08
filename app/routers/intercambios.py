@@ -8,14 +8,6 @@ from app.utils.auth import verify_token
 router = APIRouter()
 
 
-def get_db():
-    db = SessionLocal()
-    try:
-        yield db
-    finally:
-        db.close()
-
-
 @router.get("/intercambios")
 def obtener_intercambios(
     page: int = Query(1, gt=0),

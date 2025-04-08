@@ -2,7 +2,7 @@
 from app.database import Base
 from app.config import DATABASE_URL
 # Modelos para la migración
-from app.models import Usuario, Alimento
+from app.models import Usuario, Alimento, Intercambio
 
 import sys
 import os
