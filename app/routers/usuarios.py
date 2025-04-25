@@ -20,7 +20,7 @@ def create_user(
         Usuario.email == usuario_data.email).first()
     if existing_user:
         raise HTTPException(
-            status_code=400, detail="⚠️ Email already registered.")
+            status_code=400, detail="⚠️ Correo ya registrado.")
 
     hashed_pass = hash_password(usuario_data.password)
 
@@ -35,3 +35,15 @@ def create_user(
     db.commit()
     db.refresh(new_user)
     return new_user
+
+#eliminar usuario pasando su id
+@router.delete("/usuario/{usuario_id}")
+def eliminar_usuario(usuario_id: int):
+    db: Session = Depends(get_db)
+    usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
+    if not usuario:
+        raise HTTPException(status_code=404, detail="Usuario no encontrado")
+    
+    db.delete(usuario)
+    db.commit()
+    return {"mensaje": "Usuario eliminado correctamente"}

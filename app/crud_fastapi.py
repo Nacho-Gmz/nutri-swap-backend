@@ -241,8 +241,6 @@ async def update_alimento(id: int, alimento: Alimento):
             conn.close()
 
 # Para eliminar un alimento
-
-
 @app.delete("/alimentos/{id}")
 async def delete_alimento(id: int):
     """Elimina un alimento."""
@@ -350,8 +348,6 @@ async def obtener_contra_usuario(usuario_id: int):
             status_code=500, detail="No se pudo conectar a la base de datos")
 
 # Obtener un usuario por ID
-
-
 @app.get("/usuarios/{usuario_id}", response_model=Usuario)
 async def obtener_usuario(usuario_id: int):
     """Obtiene un usuario por su ID."""
@@ -376,8 +372,6 @@ async def obtener_usuario(usuario_id: int):
             status_code=500, detail="No se pudo conectar a la base de datos")
 
 # Actualizar un usuario
-
-
 @app.put("/usuarios/{usuario_id}", response_model=Usuario)
 async def actualizar_usuario(usuario_id: int, usuario: UsuarioCreate):
     """Actualiza un usuario existente."""
