@@ -13,7 +13,7 @@ class AlimentoBase(BaseModel):
     proteinas : float
     lipidos : float
     carbohidratos : float
-    updated_at : datetime
+    #updated_at : datetime
 
 
 class AlimentoRead(AlimentoBase):
