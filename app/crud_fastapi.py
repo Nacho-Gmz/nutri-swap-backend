@@ -9,11 +9,11 @@ app = FastAPI()
 
 # Configuración de la conexión
 DB_CONFIG = {
-    'dbname': 'alimentos',
-    'user': 'postgres',
-    'password': '1234567',
-    'host': 'localhost',
-    'port': 5432
+    "dbname": "alimentos",
+    "user": "postgres",
+    "password": "1234567",
+    "host": "localhost",
+    "port": 5432,
 }
 
 # Conexión a la base de datos
@@ -26,6 +26,7 @@ def connect_to_db():
     except Exception as e:
         print("Error conectando a la base de datos:", e)
         return None
+
 
 # Modelo Pydantic para la creación y actualización de alimentos
 
@@ -59,6 +60,7 @@ class Usuario(UsuarioBase):
     class Config:
         from_attributes = True
 
+
 # Endpoint para obtener todos los alimentos
 
 
@@ -69,8 +71,7 @@ async def get_all_nombrealimentos():
     if conn:
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
-            cursor.execute(
-                """SELECT "Alimento" FROM public."Datos_alimentos";""")
+            cursor.execute("""SELECT "Alimento" FROM public."Datos_alimentos";""")
             alimentos = cursor.fetchall()
             return alimentos
         except Exception as e:
@@ -79,7 +80,9 @@ async def get_all_nombrealimentos():
             conn.close()
     else:
         raise HTTPException(
-            status_code=500, detail="No se pudo conectar a la base de datos")
+            status_code=500, detail="No se pudo conectar a la base de datos"
+        )
+
 
 # Endpoint para obtener todos los alimentos
 
@@ -100,7 +103,9 @@ async def get_all_alimentos():
             conn.close()
     else:
         raise HTTPException(
-            status_code=500, detail="No se pudo conectar a la base de datos")
+            status_code=500, detail="No se pudo conectar a la base de datos"
+        )
+
 
 # Endpoint para obtener alimentos por categoría
 
@@ -119,14 +124,18 @@ async def get_categoria_by_nombre(nombre: str):
                 return alimentos
             else:
                 raise HTTPException(
-                    status_code=404, detail="No se encontraron alimentos dentro de la misma categoría")
+                    status_code=404,
+                    detail="No se encontraron alimentos dentro de la misma categoría",
+                )
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         finally:
             conn.close()
     else:
         raise HTTPException(
-            status_code=500, detail="No se pudo conectar a la base de datos")
+            status_code=500, detail="No se pudo conectar a la base de datos"
+        )
+
 
 # Endpoint para obtener un alimento por su ID
 
@@ -139,20 +148,22 @@ async def get_alimento_by_id(id: int):
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             cursor.execute(
-                """SELECT * FROM public."Datos_alimentos" WHERE id = %s;""", (id,))
+                """SELECT * FROM public."Datos_alimentos" WHERE id = %s;""", (id,)
+            )
             alimento = cursor.fetchone()
             if alimento:
                 return alimento
             else:
-                raise HTTPException(
-                    status_code=404, detail="Alimento no encontrado")
+                raise HTTPException(status_code=404, detail="Alimento no encontrado")
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         finally:
             conn.close()
     else:
         raise HTTPException(
-            status_code=500, detail="No se pudo conectar a la base de datos")
+            status_code=500, detail="No se pudo conectar a la base de datos"
+        )
+
 
 # Endpoint para obtener datos de un alimento por su nombre
 
@@ -165,17 +176,19 @@ async def get_info_alimento_by_nombre(nombre: str):
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             cursor.execute(
-                """SELECT * FROM public."Datos_alimentos" WHERE "Alimento" = %s;""", (nombre,))
+                """SELECT * FROM public."Datos_alimentos" WHERE "Alimento" = %s;""",
+                (nombre,),
+            )
             alimento = cursor.fetchone()
             if alimento:
                 return alimento
             else:
-                raise HTTPException(
-                    status_code=404, detail="Alimento no encontrado")
+                raise HTTPException(status_code=404, detail="Alimento no encontrado")
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         finally:
             conn.close()
+
 
 # Endpoint para crear un nuevo alimento
 
@@ -191,11 +204,21 @@ async def create_alimento(alimento: Alimento):
             INSERT INTO public."Datos_alimentos" ("Alimento", "Categoria", "Cantidad", "Unidad", "Peso_bruto", "Peso_neto", "Energia", "Proteinas", "Lipidos", "Carbohidratos")
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s) RETURNING id;
             """
-            cursor.execute(query, (
-                alimento.Alimento, alimento.Categoria, alimento.Cantidad, alimento.Unidad,
-                alimento.Peso_bruto, alimento.Peso_neto, alimento.Energia,
-                alimento.Proteinas, alimento.Lipidos, alimento.Carbohidratos
-            ))
+            cursor.execute(
+                query,
+                (
+                    alimento.Alimento,
+                    alimento.Categoria,
+                    alimento.Cantidad,
+                    alimento.Unidad,
+                    alimento.Peso_bruto,
+                    alimento.Peso_neto,
+                    alimento.Energia,
+                    alimento.Proteinas,
+                    alimento.Lipidos,
+                    alimento.Carbohidratos,
+                ),
+            )
             conn.commit()
             new_id = cursor.fetchone()[0]
             return {"message": "Alimento creado", "id": new_id}
@@ -205,7 +228,9 @@ async def create_alimento(alimento: Alimento):
             conn.close()
     else:
         raise HTTPException(
-            status_code=500, detail="No se pudo conectar a la base de datos")
+            status_code=500, detail="No se pudo conectar a la base de datos"
+        )
+
 
 # Endpoint para actualizar un alimento
 
@@ -224,21 +249,32 @@ async def update_alimento(id: int, alimento: Alimento):
                 "Proteinas" = %s, "Lipidos" = %s, "Carbohidratos" = %s
             WHERE id = %s;
             """
-            cursor.execute(query, (
-                alimento.Alimento, alimento.Categoria, alimento.Cantidad, alimento.Unidad,
-                alimento.Peso_bruto, alimento.Peso_neto, alimento.Energia,
-                alimento.Proteinas, alimento.Lipidos, alimento.Carbohidratos, id
-            ))
+            cursor.execute(
+                query,
+                (
+                    alimento.Alimento,
+                    alimento.Categoria,
+                    alimento.Cantidad,
+                    alimento.Unidad,
+                    alimento.Peso_bruto,
+                    alimento.Peso_neto,
+                    alimento.Energia,
+                    alimento.Proteinas,
+                    alimento.Lipidos,
+                    alimento.Carbohidratos,
+                    id,
+                ),
+            )
             conn.commit()
             if cursor.rowcount > 0:
                 return {"message": "Alimento actualizado"}
             else:
-                raise HTTPException(
-                    status_code=404, detail="Alimento no encontrado")
+                raise HTTPException(status_code=404, detail="Alimento no encontrado")
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         finally:
             conn.close()
+
 
 # Para eliminar un alimento
 @app.delete("/alimentos/{id}")
@@ -254,25 +290,30 @@ async def delete_alimento(id: int):
             if cursor.rowcount > 0:
                 return {"message": "Alimento eliminado"}
             else:
-                raise HTTPException(
-                    status_code=404, detail="Alimento no encontrado")
+                raise HTTPException(status_code=404, detail="Alimento no encontrado")
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         finally:
             conn.close()
 
             """USUARIOS"""
+
+
 # Función para hashear la contraseña
 
 
 def hash_contrasenia(contrasenia: str) -> str:
-    return bcrypt.hashpw(contrasenia.encode('utf-8'), bcrypt.gensalt()).decode('utf-8')
+    return bcrypt.hashpw(contrasenia.encode("utf-8"), bcrypt.gensalt()).decode("utf-8")
+
 
 # Función para verificar la contraseña
 
 
 def verificar_contrasenia(hashed_contrasenia: str, contrasenia: str) -> bool:
-    return bcrypt.checkpw(contrasenia.encode('utf-8'), hashed_contrasenia.encode('utf-8'))
+    return bcrypt.checkpw(
+        contrasenia.encode("utf-8"), hashed_contrasenia.encode("utf-8")
+    )
+
 
 # Crear un nuevo usuario
 
@@ -289,11 +330,18 @@ async def crear_usuario(usuario: UsuarioCreate):
             INSERT INTO usuarios (nombre, apellidos, correo, contrasenia)
             VALUES (%s, %s, %s, %s) RETURNING id;
             """
-            cursor.execute(query, (usuario.nombre, usuario.apellidos,
-                           usuario.correo, hashed_contrasenia))
+            cursor.execute(
+                query,
+                (usuario.nombre, usuario.apellidos, usuario.correo, hashed_contrasenia),
+            )
             conn.commit()
             new_id = cursor.fetchone()[0]
-            return Usuario(id=new_id, nombre=usuario.nombre, apellidos=usuario.apellidos, correo=usuario.correo)
+            return Usuario(
+                id=new_id,
+                nombre=usuario.nombre,
+                apellidos=usuario.apellidos,
+                correo=usuario.correo,
+            )
         except Exception as e:
             conn.rollback()
             raise HTTPException(status_code=500, detail=str(e))
@@ -301,7 +349,9 @@ async def crear_usuario(usuario: UsuarioCreate):
             conn.close()
     else:
         raise HTTPException(
-            status_code=500, detail="No se pudo conectar a la base de datos")
+            status_code=500, detail="No se pudo conectar a la base de datos"
+        )
+
 
 # Obtener todos los usuarios
 
@@ -313,8 +363,7 @@ async def obtener_usuarios():
     if conn:
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
-            cursor.execute(
-                "SELECT id, nombre, apellidos, correo FROM usuarios;")
+            cursor.execute("SELECT id, nombre, apellidos, correo FROM usuarios;")
             usuarios = cursor.fetchall()
             return [Usuario(**usuario) for usuario in usuarios]
         except Exception as e:
@@ -323,7 +372,9 @@ async def obtener_usuarios():
             conn.close()
     else:
         raise HTTPException(
-            status_code=500, detail="No se pudo conectar a la base de datos")
+            status_code=500, detail="No se pudo conectar a la base de datos"
+        )
+
 
 # Obtener hash de contrasenia de un usuario
 
@@ -336,7 +387,8 @@ async def obtener_contra_usuario(usuario_id: int):
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             cursor.execute(
-                "SELECT contrasenia FROM usuarios WHERE id = %s;", (usuario_id,))
+                "SELECT contrasenia FROM usuarios WHERE id = %s;", (usuario_id,)
+            )
             contra = cursor.fetchall()
             return [contra]
         except Exception as e:
@@ -345,7 +397,9 @@ async def obtener_contra_usuario(usuario_id: int):
             conn.close()
     else:
         raise HTTPException(
-            status_code=500, detail="No se pudo conectar a la base de datos")
+            status_code=500, detail="No se pudo conectar a la base de datos"
+        )
+
 
 # Obtener un usuario por ID
 @app.get("/usuarios/{usuario_id}", response_model=Usuario)
@@ -356,20 +410,23 @@ async def obtener_usuario(usuario_id: int):
         try:
             cursor = conn.cursor(cursor_factory=RealDictCursor)
             cursor.execute(
-                "SELECT id, nombre, apellidos, correo FROM usuarios WHERE id = %s;", (usuario_id,))
+                "SELECT id, nombre, apellidos, correo FROM usuarios WHERE id = %s;",
+                (usuario_id,),
+            )
             usuario = cursor.fetchone()
             if usuario:
                 return Usuario(**usuario)
             else:
-                raise HTTPException(
-                    status_code=404, detail="Usuario no encontrado")
+                raise HTTPException(status_code=404, detail="Usuario no encontrado")
         except Exception as e:
             raise HTTPException(status_code=500, detail=str(e))
         finally:
             conn.close()
     else:
         raise HTTPException(
-            status_code=500, detail="No se pudo conectar a la base de datos")
+            status_code=500, detail="No se pudo conectar a la base de datos"
+        )
+
 
 # Actualizar un usuario
 @app.put("/usuarios/{usuario_id}", response_model=Usuario)
@@ -385,14 +442,26 @@ async def actualizar_usuario(usuario_id: int, usuario: UsuarioCreate):
             SET nombre = %s, apellidos = %s, correo = %s, contrasenia = %s
             WHERE id = %s RETURNING id;
             """
-            cursor.execute(query, (usuario.nombre, usuario.apellidos,
-                           usuario.correo, hashed_contrasenia, usuario_id))
+            cursor.execute(
+                query,
+                (
+                    usuario.nombre,
+                    usuario.apellidos,
+                    usuario.correo,
+                    hashed_contrasenia,
+                    usuario_id,
+                ),
+            )
             conn.commit()
             if cursor.rowcount > 0:
-                return Usuario(id=usuario_id, nombre=usuario.nombre, apellidos=usuario.apellidos, correo=usuario.correo)
+                return Usuario(
+                    id=usuario_id,
+                    nombre=usuario.nombre,
+                    apellidos=usuario.apellidos,
+                    correo=usuario.correo,
+                )
             else:
-                raise HTTPException(
-                    status_code=404, detail="Usuario no encontrado")
+                raise HTTPException(status_code=404, detail="Usuario no encontrado")
         except Exception as e:
             conn.rollback()
             raise HTTPException(status_code=500, detail=str(e))
@@ -400,7 +469,9 @@ async def actualizar_usuario(usuario_id: int, usuario: UsuarioCreate):
             conn.close()
     else:
         raise HTTPException(
-            status_code=500, detail="No se pudo conectar a la base de datos")
+            status_code=500, detail="No se pudo conectar a la base de datos"
+        )
+
 
 # Eliminar un usuario
 
@@ -413,16 +484,16 @@ async def eliminar_usuario(usuario_id: int):
         try:
             cursor = conn.cursor()
             cursor.execute(
-                "SELECT id, nombre, apellidos, correo FROM usuarios WHERE id = %s;", (usuario_id,))
+                "SELECT id, nombre, apellidos, correo FROM usuarios WHERE id = %s;",
+                (usuario_id,),
+            )
             usuario = cursor.fetchone()
             if usuario:
-                cursor.execute(
-                    "DELETE FROM usuarios WHERE id = %s;", (usuario_id,))
+                cursor.execute("DELETE FROM usuarios WHERE id = %s;", (usuario_id,))
                 conn.commit()
                 return Usuario(**usuario)
             else:
-                raise HTTPException(
-                    status_code=404, detail="Usuario no encontrado")
+                raise HTTPException(status_code=404, detail="Usuario no encontrado")
         except Exception as e:
             conn.rollback()
             raise HTTPException(status_code=500, detail=str(e))
@@ -430,4 +501,5 @@ async def eliminar_usuario(usuario_id: int):
             conn.close()
     else:
         raise HTTPException(
-            status_code=500, detail="No se pudo conectar a la base de datos")
+            status_code=500, detail="No se pudo conectar a la base de datos"
+        )

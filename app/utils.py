@@ -33,19 +33,18 @@ def verify_password(plain_password: str, hashed_password: str) -> bool:
 
 def create_access_token(data: dict) -> str:
     """
-    Genera un JWT con data. 
+    Genera un JWT con data.
     Agrega fecha de expiración (Token Expire).
     """
     to_encode = data.copy()
-    expire = datetime.now(timezone.utc) + \
-        timedelta(minutes=TOKEN_EXPIRE_MINUTES)
+    expire = datetime.now(timezone.utc) + timedelta(minutes=TOKEN_EXPIRE_MINUTES)
     to_encode.update({"exp": expire})
     encoded_jwt = jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
     return encoded_jwt
 
 
 def decode_access_token(token: str) -> dict:
-    """ 
+    """
     Decodifica el token JWT.
     Retorna el contenido si es válido, o lanza excepción JWTError si no lo es.
     """
@@ -56,10 +55,7 @@ def decode_access_token(token: str) -> dict:
         return {}
 
 
-def validate_user(
-    token: str = Depends(oauth2_scheme),
-    db: Session = Depends(get_db)
-):
+def validate_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)):
     try:
         payload = decode_access_token(token)
         if not payload:
@@ -82,7 +78,7 @@ def validate_user(
             headers={"WWW-Authenticate": "Bearer"},
         )
 
-    user = db.query(User).get(user_id)
+    user = db.query(Usuario).get(user_id)
     if not user:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,

@@ -1,25 +1,26 @@
 from fastapi import FastAPI
-from app.routers import usuarios, alimentos
+from app.routers import auth, usuarios, alimentos
 
 from fastapi.middleware.cors import CORSMiddleware
 
 app = FastAPI()
 
 # Especificar origenes
-origins = []
+origins = ["*"]
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],
+    allow_origins=origins,
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
 
+app.include_router(auth.router, prefix="/auth", tags=["Autenticacion"])
 app.include_router(usuarios.router, prefix="/usuarios", tags=["Usuarios"])
 app.include_router(alimentos.router, prefix="/alimentos", tags=["Alimentos"])
 
 
 @app.get("/")
 def root():
-    return {"message": "Welcome to the nutri-swap API"}
+    return {"message": "Bienvenido a la API de NutriSwap"}

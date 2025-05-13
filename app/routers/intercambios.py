@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from app.database import SessionLocal
 from app.models.intercambios import Intercambio
 from app.schemas.intercambios import IntercambioBase
-from app.utils.auth import verify_token
+from app.utils import verify_token, get_db
 
 router = APIRouter()
 
@@ -13,7 +13,7 @@ def obtener_intercambios(
     page: int = Query(1, gt=0),
     limit: int = Query(10, gt=0),
     db: Session = Depends(get_db),
-    usuario_id: int = Depends(verify_token)
+    usuario_id: int = Depends(verify_token),
 ):
     """
     Retorna un objeto JSON con:
@@ -30,7 +30,7 @@ def obtener_intercambios(
 def crear_intercambio(
     intercambio_data: IntercambioBase,
     db: Session = Depends(get_db),
-    usuario_id: int = Depends(verify_token)
+    usuario_id: int = Depends(verify_token),
 ):
     """
     Recibe un objeto JSON con:
@@ -41,7 +41,7 @@ def crear_intercambio(
     intercambio = Intercambio(
         alimento_original_id=intercambio_data.alimento_original_id,
         alimento_intercambiado_id=intercambio_data.alimento_intercambiado_id,
-        usuario_id=usuario_id
+        usuario_id=usuario_id,
     )
     db.add(intercambio)
     db.commit()

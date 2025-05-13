@@ -4,12 +4,12 @@ from pydantic import ConfigDict, BaseModel, EmailStr
 class UsuarioBase(BaseModel):
     nombre: str
     apellidos: str
-    email: EmailStr
+    correo: EmailStr
     activo: bool = True
 
 
 class UsuarioCreate(UsuarioBase):
-    password: str
+    contraseña: str
 
 
 class UsuarioRead(UsuarioBase):

@@ -9,17 +9,35 @@ from app.utils import get_db
 
 router = APIRouter()
 
+
+# Obtener datos de un alimento basado en su id
+@router.get("/alimento/{id}", response_model=AlimentoRead)
+def obtener_alimento_por_id(id: int, db: Session = Depends(get_db)):
+    alimento = db.query(Alimento).filter(Alimento.id == id).first()
+    if not alimento:
+        raise HTTPException(status_code=404, detail="Alimento no encontrado")
+    return alimento
+
+
+# Obtener datos de un alimento basado en su nombre
+@router.get("/alimento/{alimento_nombre}", response_model=AlimentoRead)
+def obtener_alimento_por_nombre(alimento_nombre: str, db: Session = Depends(get_db)):
+    alimento = db.query(Alimento).filter(Alimento.alimento == alimento_nombre).first()
+    if not alimento:
+        raise HTTPException(status_code=404, detail="Alimento no encontrado")
+    return alimento
+
+
 @router.post("/alimento", response_model=AlimentoRead)
 def crear_alimento(
     alimento_data: AlimentoRead,
     db: Session = Depends(get_db),
-
 ):
-    aliemento_existente = db.query(Alimento).filter(
-        Alimento.alimento == alimento_data.alimento).first()
+    aliemento_existente = (
+        db.query(Alimento).filter(Alimento.alimento == alimento_data.alimento).first()
+    )
     if aliemento_existente:
-        raise HTTPException(
-            status_code=400, detail="⚠️ Alimento ya registrado.")
+        raise HTTPException(status_code=400, detail="⚠️ Alimento ya registrado.")
 
     nuevo_alimento = Alimento(
         alimento=alimento_data.alimento,
@@ -40,20 +58,26 @@ def crear_alimento(
     db.refresh(nuevo_alimento)
     return nuevo_alimento
 
-#eliminar alimento pasando su id
+
+# eliminar alimento pasando su id
 @router.delete("/alimento/{alimento_nombre}")
 def eliminar_alimento(alimento_nombre: str, db: Session = Depends(get_db)):
     alimento = db.query(Alimento).filter(Alimento.alimento == alimento_nombre).first()
     if not alimento:
         raise HTTPException(status_code=404, detail="Alimento no encontrado")
-    
+
     db.delete(alimento)
     db.commit()
     return {"mensaje": "Alimento eliminado correctamente"}
 
-#Actualizar alimento
+
+# Actualizar alimento
 @router.put("/alimento/{alimento_nombre}", response_model=AlimentoRead)
-def actualizar_alimento(alimento_nombre: int, datos_actualizados: AlimentoBase, db: Session = Depends(get_db)):
+def actualizar_alimento(
+    alimento_nombre: int,
+    datos_actualizados: AlimentoBase,
+    db: Session = Depends(get_db),
+):
     alimento = db.query(Alimento).filter(Alimento.alimento == alimento_nombre).first()
     if not alimento:
         raise HTTPException(status_code=404, detail="Alimento no encontrado")
@@ -73,39 +97,28 @@ def actualizar_alimento(alimento_nombre: int, datos_actualizados: AlimentoBase, 
     db.refresh(alimento)
     return alimento
 
-#Obtener todos los alimentos
+
+# Obtener todos los alimentos
 @router.get("/alimentos", response_model=List[AlimentoRead])
 def obtener_todos_alimentos(db: Session = Depends(get_db)):
     alimentos = db.query(Alimento)
     if not alimentos:
-        raise HTTPException(status_code=404, detail="Alimentos no encontrados")  
+        raise HTTPException(status_code=404, detail="Alimentos no encontrados")
     return alimentos
 
-#Obtener lista de alimentos de la misma categoria dando el nombre de un alimento
+
+# Obtener lista de alimentos de la misma categoria dando el nombre de un alimento
 @router.get("/alimentos/categoria/{nombre}", response_model=List[AlimentoRead])
 def obtener_alimentos_misma_categoria(nombre: str, db: Session = Depends(get_db)):
     alimento_base = db.query(Alimento).filter(Alimento.alimento == nombre).first()
     if not alimento_base:
         raise HTTPException(status_code=404, detail="Alimento no encontrado")
 
-    alimentos = db.query(Alimento).filter(
-        Alimento.categoria == alimento_base.categoria,
-        Alimento.alimento != nombre
-    ).all()
+    alimentos = (
+        db.query(Alimento)
+        .filter(
+            Alimento.categoria == alimento_base.categoria, Alimento.alimento != nombre
+        )
+        .all()
+    )
     return alimentos
-
-#Obtener datos de un alimento basado en su id
-@router.get("/alimentos/{id}", response_model=AlimentoRead)
-def obtener_alimento_por_id(id: int, db: Session = Depends(get_db)):
-    alimento = db.query(Alimento).filter(Alimento.id == id).first()
-    if not alimento:
-        raise HTTPException(status_code=404, detail="Alimento no encontrado")
-    return alimento
-
-#Obtener datos de un alimento basado en su nombre
-@router.get("/alimentos/{alimento_nombre}", response_model=AlimentoRead)
-def obtener_alimento_por_nombre(alimento_nombre: str, db: Session = Depends(get_db)):
-    alimento = db.query(Alimento).filter(Alimento.alimento == alimento_nombre).first()
-    if not alimento:
-        raise HTTPException(status_code=404, detail="Alimento no encontrado")
-    return alimento
