@@ -2,8 +2,8 @@ from pydantic import BaseModel, EmailStr
 
 
 class LoginUsuario(BaseModel):
-    email: EmailStr
-    password: str
+    correo: EmailStr
+    contraseña: str
 
 
 class Token(BaseModel):

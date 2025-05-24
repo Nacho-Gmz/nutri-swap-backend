@@ -1,26 +1,35 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
+from app.crud_fastapi import UsuarioCreate
 from app.models.usuarios import Usuario
 from app.schemas.auth import LoginUsuario, Token
-from app.utils import verify_password, create_access_token, get_db, validate_user
+from app.utils import (
+    hash_password,
+    verify_password,
+    create_access_token,
+    get_db,
+    validate_user,
+)
 
 router = APIRouter()
 
 
 @router.post("/login", response_model=Token)
 def login(user_credentials: LoginUsuario, db: Session = Depends(get_db)):
-    user = db.query(Usuario).filter(Usuario.email == user_credentials.email).first()
+    user = db.query(Usuario).filter(Usuario.correo == user_credentials.correo).first()
     if not user:
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Correo o contraseña no válidos.",
         )
 
-    if not verify_password(user_credentials.password, user.password):
+    if not verify_password(user_credentials.contraseña, user.contraseña):
         raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid email or password"
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Correo o contraseña no válidos.",
         )
 
-    access_token = create_access_token({"user_id": user.id, "email": user.email})
+    access_token = create_access_token({"user_id": user.id, "email": user.correo})
 
     return Token(access_token=access_token)
 
@@ -28,6 +37,6 @@ def login(user_credentials: LoginUsuario, db: Session = Depends(get_db)):
 @router.post("/refresh-token", response_model=Token)
 def refresh_token(current_user: Usuario = Depends(validate_user)):
     access_token = create_access_token(
-        {"user_id": current_user.id, "email": current_user.email}
+        {"user_id": current_user.id, "email": current_user.correo}
     )
     return Token(access_token=access_token)

@@ -10,11 +10,10 @@ from app.utils import hash_password, get_db, validate_user
 router = APIRouter()
 
 
-@router.post("/sign-up", response_model=UsuarioRead)
-def create_user(
+@router.post("/", response_model=UsuarioRead)
+def crear_usuario(
     usuario_data: UsuarioCreate,
     db: Session = Depends(get_db),
-    current: Usuario = Depends(validate_user),
 ):
     existing_user = (
         db.query(Usuario).filter(Usuario.correo == usuario_data.correo).first()
@@ -22,7 +21,7 @@ def create_user(
     if existing_user:
         raise HTTPException(status_code=400, detail="⚠️ Correo ya registrado.")
 
-    hashed_pass = hash_password(usuario_data.password)
+    hashed_pass = hash_password(usuario_data.contraseña)
 
     new_user = Usuario(
         nombre=usuario_data.nombre,
@@ -37,14 +36,8 @@ def create_user(
     return new_user
 
 
-# eliminar usuario pasando su id
-@router.delete("/usuario/{usuario_id}")
-def eliminar_usuario(usuario_id: int):
-    db: Session = Depends(get_db)
-    usuario = db.query(Usuario).filter(Usuario.id == usuario_id).first()
-    if not usuario:
-        raise HTTPException(status_code=404, detail="Usuario no encontrado")
-
-    db.delete(usuario)
-    db.commit()
-    return {"mensaje": "Usuario eliminado correctamente"}
+@router.get("/", response_model=List[UsuarioRead])
+def list_users(
+    db: Session = Depends(get_db), usuario_actual: Usuario = Depends(validate_user)
+):
+    return db.query(Usuario).all()
