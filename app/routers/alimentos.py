@@ -20,7 +20,7 @@ def obtener_alimento_por_id(id: int, db: Session = Depends(get_db)):
 
 
 # Obtener datos de un alimento basado en su nombre
-@router.get("/alimento/{alimento_nombre}", response_model=AlimentoRead)
+@router.get("/alimento/nombre/{alimento_nombre}", response_model=AlimentoRead)
 def obtener_alimento_por_nombre(alimento_nombre: str, db: Session = Depends(get_db)):
     alimento = db.query(Alimento).filter(Alimento.alimento == alimento_nombre).first()
     if not alimento:
