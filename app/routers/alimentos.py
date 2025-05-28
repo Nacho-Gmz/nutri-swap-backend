@@ -2,7 +2,6 @@ from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from typing import List
 
-from app.database import SessionLocal
 from app.models.alimentos import Alimento
 from app.schemas.alimentos import AlimentoRead, AlimentoBase
 from app.utils import get_db
@@ -10,25 +9,8 @@ from app.utils import get_db
 router = APIRouter()
 
 
-# Obtener datos de un alimento basado en su id
-@router.get("/alimento/{id}", response_model=AlimentoRead)
-def obtener_alimento_por_id(id: int, db: Session = Depends(get_db)):
-    alimento = db.query(Alimento).filter(Alimento.id == id).first()
-    if not alimento:
-        raise HTTPException(status_code=404, detail="Alimento no encontrado")
-    return alimento
-
-
-# Obtener datos de un alimento basado en su nombre
-@router.get("/alimento/nombre/{alimento_nombre}", response_model=AlimentoRead)
-def obtener_alimento_por_nombre(alimento_nombre: str, db: Session = Depends(get_db)):
-    alimento = db.query(Alimento).filter(Alimento.alimento == alimento_nombre).first()
-    if not alimento:
-        raise HTTPException(status_code=404, detail="Alimento no encontrado")
-    return alimento
-
-
-@router.post("/alimento", response_model=AlimentoRead)
+# Crear un nuevo alimento
+@router.post("/", response_model=AlimentoRead)
 def crear_alimento(
     alimento_data: AlimentoRead,
     db: Session = Depends(get_db),
@@ -59,10 +41,47 @@ def crear_alimento(
     return nuevo_alimento
 
 
-# eliminar alimento pasando su id
-@router.delete("/alimento/{alimento_nombre}")
-def eliminar_alimento(alimento_nombre: str, db: Session = Depends(get_db)):
+# Obtener todos los alimentos
+@router.get("/", response_model=List[AlimentoRead])
+def obtener_todos_alimentos(db: Session = Depends(get_db)):
+    alimentos = db.query(Alimento).all()
+    if not alimentos:
+        raise HTTPException(status_code=404, detail="Alimentos no encontrados")
+    return alimentos
+
+
+# Obtener nombres de todos los alimentos
+@router.get("/nombres", response_model=List[str])
+def obtener_nombres_alimentos(db: Session = Depends(get_db)):
+    nombres = db.query(Alimento.alimento).all()
+    if not nombres:
+        raise HTTPException(status_code=404, detail="Alimentos no encontrados")
+    # Extraer solo los nombres de la lista de tuplas
+    return [nombre[0] for nombre in nombres]
+
+
+# Obtener datos de un alimento basado en su id
+@router.get("/{id}", response_model=AlimentoRead)
+def obtener_alimento_por_id(id: int, db: Session = Depends(get_db)):
+    alimento = db.query(Alimento).filter(Alimento.id == id).first()
+    if not alimento:
+        raise HTTPException(status_code=404, detail="Alimento no encontrado")
+    return alimento
+
+
+# Obtener datos de un alimento basado en su nombre
+@router.get("/{alimento_nombre}", response_model=AlimentoRead)
+def obtener_alimento_por_nombre(alimento_nombre: str, db: Session = Depends(get_db)):
     alimento = db.query(Alimento).filter(Alimento.alimento == alimento_nombre).first()
+    if not alimento:
+        raise HTTPException(status_code=404, detail="Alimento no encontrado")
+    return alimento
+
+
+# eliminar alimento pasando su id
+@router.delete("/{id}")
+def eliminar_alimento(id: int, db: Session = Depends(get_db)):
+    alimento = db.query(Alimento).filter(Alimento.id == id).first()
     if not alimento:
         raise HTTPException(status_code=404, detail="Alimento no encontrado")
 
@@ -72,13 +91,13 @@ def eliminar_alimento(alimento_nombre: str, db: Session = Depends(get_db)):
 
 
 # Actualizar alimento
-@router.put("/alimento/{alimento_nombre}", response_model=AlimentoRead)
+@router.put("/{id}", response_model=AlimentoRead)
 def actualizar_alimento(
-    alimento_nombre: int,
+    id: int,
     datos_actualizados: AlimentoBase,
     db: Session = Depends(get_db),
 ):
-    alimento = db.query(Alimento).filter(Alimento.alimento == alimento_nombre).first()
+    alimento = db.query(Alimento).filter(Alimento.id == id).first()
     if not alimento:
         raise HTTPException(status_code=404, detail="Alimento no encontrado")
     alimento.alimento = datos_actualizados.alimento
@@ -98,27 +117,16 @@ def actualizar_alimento(
     return alimento
 
 
-# Obtener todos los alimentos
-@router.get("/alimentos", response_model=List[AlimentoRead])
-def obtener_todos_alimentos(db: Session = Depends(get_db)):
-    alimentos = db.query(Alimento)
-    if not alimentos:
-        raise HTTPException(status_code=404, detail="Alimentos no encontrados")
-    return alimentos
-
-
-# Obtener lista de alimentos de la misma categoria dando el nombre de un alimento
-@router.get("/alimentos/categoria/{nombre}", response_model=List[AlimentoRead])
-def obtener_alimentos_misma_categoria(nombre: str, db: Session = Depends(get_db)):
-    alimento_base = db.query(Alimento).filter(Alimento.alimento == nombre).first()
+# Obtener lista de alimentos de la misma categoria dando el id de un alimento
+@router.get("/alimentos/categoria/{id}", response_model=List[AlimentoRead])
+def obtener_alimentos_misma_categoria(id: str, db: Session = Depends(get_db)):
+    alimento_base = db.query(Alimento).filter(Alimento.id == id).first()
     if not alimento_base:
         raise HTTPException(status_code=404, detail="Alimento no encontrado")
 
     alimentos = (
         db.query(Alimento)
-        .filter(
-            Alimento.categoria == alimento_base.categoria, Alimento.alimento != nombre
-        )
+        .filter(Alimento.categoria == alimento_base.categoria, Alimento.alimento != id)
         .all()
     )
     return alimentos
