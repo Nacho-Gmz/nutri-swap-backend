@@ -5,7 +5,7 @@ from typing import List
 from app.models.alimentos import Alimento
 from app.schemas.alimentos import AlimentoRead, AlimentoBase
 from app.utils import get_db
-from app.ia import obtener_sustitutos_kmeans
+from app.ia import obtener_sustitutos_ordenados
 
 router = APIRouter()
 
@@ -141,5 +141,5 @@ def obtener_alimentos_misma_categoria(id: str, db: Session = Depends(get_db)):
         .filter(Alimento.categoria == alimento_base.categoria)
         .all()
     )
-    obtener_sustitutos_kmeans(alimento_base, alimentos)
-    return alimentos
+    lista_aliementos = obtener_sustitutos_ordenados(alimento_base, alimentos)
+    return lista_aliementos
