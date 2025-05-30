@@ -5,6 +5,7 @@ from typing import List
 from app.models.alimentos import Alimento
 from app.schemas.alimentos import AlimentoRead, AlimentoBase
 from app.utils import get_db
+from app.ia import obtener_sustitutos_kmeans
 
 router = APIRouter()
 
@@ -123,10 +124,22 @@ def obtener_alimentos_misma_categoria(id: str, db: Session = Depends(get_db)):
     alimento_base = db.query(Alimento).filter(Alimento.id == id).first()
     if not alimento_base:
         raise HTTPException(status_code=404, detail="Alimento no encontrado")
-
     alimentos = (
         db.query(Alimento)
-        .filter(Alimento.categoria == alimento_base.categoria, Alimento.alimento != id)
+        .filter(Alimento.categoria == alimento_base.categoria, Alimento.id != id)
         .all()
     )
+    return alimentos
+
+@router.get("/ia/{id}", response_model=List[AlimentoRead])
+def obtener_alimentos_misma_categoria(id: str, db: Session = Depends(get_db)):
+    alimento_base = db.query(Alimento).filter(Alimento.id == id).first()
+    if not alimento_base:
+        raise HTTPException(status_code=404, detail="Alimento no encontrado")
+    alimentos = (
+        db.query(Alimento)
+        .filter(Alimento.categoria == alimento_base.categoria)
+        .all()
+    )
+    obtener_sustitutos_kmeans(alimento_base, alimentos)
     return alimentos

@@ -15,9 +15,11 @@ def crear_usuario(
     usuario_data: UsuarioCreate,
     db: Session = Depends(get_db),
 ):
+    print("************************ANTES******************")
     existing_user = (
         db.query(Usuario).filter(Usuario.correo == usuario_data.correo).first()
     )
+    print("************************DESPUES******************")
     if existing_user:
         raise HTTPException(status_code=400, detail="⚠️ Correo ya registrado.")
 
