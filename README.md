@@ -24,6 +24,15 @@ DB_PASSWORD={contraseña}
 DB_NAME={nombre de base de datos}
 ```
 
+## Agregar un usuario a base de datos 
+
+Manualmente desde un administrador de la base de datos crear una fila nueva en la tabla de usuarios:
+La contraseña está hasheada y es "admin123".
+
+```sql 
+Juan, Perez, email@email.com, $2b$12$uZCGwLNDZxH4HfDxAnbaPe8L4B0TSJ3NhRqbrhnGj3wsSIGf/gZgC, true
+```
+
 ## Ejecutar migraciones
 
 ```bash

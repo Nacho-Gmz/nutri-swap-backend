@@ -1,12 +1,12 @@
 from sklearn.cluster import KMeans
 import numpy as np
 
-def obtener_sustitutos_ordenados(alimento_obj, lista_alimentos, n_clusters=20):
+
+def obtener_sustitutos_ordenados(alimento_obj, lista_alimentos, n_clusters=5):
     # Paso 1: Crear matriz nutricional
-    datos_nutricionales = np.array([
-        [a.energia, a.proteinas, a.lipidos, a.carbohidratos]
-        for a in lista_alimentos
-    ])
+    datos_nutricionales = np.array(
+        [[a.energia, a.proteinas, a.lipidos, a.carbohidratos] for a in lista_alimentos]
+    )
 
     # Paso 2: Aplicar K-Means
     kmeans = KMeans(n_clusters=n_clusters, random_state=0).fit(datos_nutricionales)
@@ -29,4 +29,3 @@ def obtener_sustitutos_ordenados(alimento_obj, lista_alimentos, n_clusters=20):
 
     # Paso 6: Retornar solo la lista de objetos Alimento ordenados
     return [alimento for alimento, _ in candidatos_ordenados]
-

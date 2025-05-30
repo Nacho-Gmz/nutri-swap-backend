@@ -131,15 +131,14 @@ def obtener_alimentos_misma_categoria(id: str, db: Session = Depends(get_db)):
     )
     return alimentos
 
+
 @router.get("/ia/{id}", response_model=List[AlimentoRead])
-def obtener_alimentos_misma_categoria(id: str, db: Session = Depends(get_db)):
+def obtener_alimentos_ia(id: str, db: Session = Depends(get_db)):
     alimento_base = db.query(Alimento).filter(Alimento.id == id).first()
     if not alimento_base:
         raise HTTPException(status_code=404, detail="Alimento no encontrado")
     alimentos = (
-        db.query(Alimento)
-        .filter(Alimento.categoria == alimento_base.categoria)
-        .all()
+        db.query(Alimento).filter(Alimento.categoria == alimento_base.categoria).all()
     )
     lista_aliementos = obtener_sustitutos_ordenados(alimento_base, alimentos)
     return lista_aliementos
