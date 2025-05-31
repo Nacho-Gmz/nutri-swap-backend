@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from app.routers import auth, usuarios, alimentos
+from app.routers import auth, intercambios, usuarios, alimentos
 
 from fastapi.middleware.cors import CORSMiddleware
 
@@ -19,6 +19,7 @@ app.add_middleware(
 app.include_router(auth.router, prefix="/auth", tags=["Autenticacion"])
 app.include_router(usuarios.router, prefix="/usuarios", tags=["Usuarios"])
 app.include_router(alimentos.router, prefix="/alimentos", tags=["Alimentos"])
+app.include_router(intercambios.router, prefix="/intercambios", tags=["Intercambios"])
 
 
 @app.get("/")
