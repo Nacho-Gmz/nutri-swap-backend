@@ -3,7 +3,12 @@ from sqlalchemy.orm import Session
 from typing import List
 
 from app.models.alimentos import Alimento
-from app.schemas.alimentos import AlimentoRead, AlimentoBase
+from app.schemas.alimentos import (
+    AlimentoNombreId,
+    AlimentoRead,
+    AlimentoBase,
+    AlimentoSustituto,
+)
 from app.utils import get_db
 from app.ia import obtener_sustitutos_ordenados
 
@@ -52,13 +57,13 @@ def obtener_todos_alimentos(db: Session = Depends(get_db)):
 
 
 # Obtener nombres de todos los alimentos
-@router.get("/nombres", response_model=List[str])
+@router.get("/nombres", response_model=List[AlimentoNombreId])
 def obtener_nombres_alimentos(db: Session = Depends(get_db)):
-    nombres = db.query(Alimento.alimento).all()
+    nombres = db.query(Alimento.id, Alimento.alimento).all()
     if not nombres:
         raise HTTPException(status_code=404, detail="Alimentos no encontrados")
     # Extraer solo los nombres de la lista de tuplas
-    return [nombre[0] for nombre in nombres]
+    return [nombre for nombre in nombres]
 
 
 # Obtener datos de un alimento basado en su id
@@ -71,12 +76,12 @@ def obtener_alimento_por_id(id: int, db: Session = Depends(get_db)):
 
 
 # Obtener datos de un alimento basado en su nombre
-@router.get("/{alimento_nombre}", response_model=AlimentoRead)
-def obtener_alimento_por_nombre(alimento_nombre: str, db: Session = Depends(get_db)):
-    alimento = db.query(Alimento).filter(Alimento.alimento == alimento_nombre).first()
-    if not alimento:
-        raise HTTPException(status_code=404, detail="Alimento no encontrado")
-    return alimento
+# @router.get("/{alimento_nombre}", response_model=AlimentoRead)
+# def obtener_alimento_por_nombre(alimento_nombre: str, db: Session = Depends(get_db)):
+#     alimento = db.query(Alimento).filter(Alimento.alimento == alimento_nombre).first()
+#     if not alimento:
+#         raise HTTPException(status_code=404, detail="Alimento no encontrado")
+#     return alimento
 
 
 # eliminar alimento pasando su id
@@ -119,7 +124,7 @@ def actualizar_alimento(
 
 
 # Obtener lista de alimentos de la misma categoria dando el id de un alimento
-@router.get("/alimentos/categoria/{id}", response_model=List[AlimentoRead])
+@router.get("/categoria/{id}", response_model=List[AlimentoRead])
 def obtener_alimentos_misma_categoria(id: str, db: Session = Depends(get_db)):
     alimento_base = db.query(Alimento).filter(Alimento.id == id).first()
     if not alimento_base:
@@ -132,7 +137,7 @@ def obtener_alimentos_misma_categoria(id: str, db: Session = Depends(get_db)):
     return alimentos
 
 
-@router.get("/ia/{id}", response_model=List[AlimentoRead])
+@router.get("/ia/{id}", response_model=List[AlimentoSustituto])
 def obtener_alimentos_ia(id: str, db: Session = Depends(get_db)):
     alimento_base = db.query(Alimento).filter(Alimento.id == id).first()
     if not alimento_base:
@@ -141,4 +146,12 @@ def obtener_alimentos_ia(id: str, db: Session = Depends(get_db)):
         db.query(Alimento).filter(Alimento.categoria == alimento_base.categoria).all()
     )
     lista_aliementos = obtener_sustitutos_ordenados(alimento_base, alimentos)
-    return lista_aliementos
+    resultado = []
+    for alimento, similitud in lista_aliementos:
+        resultado.append(
+            AlimentoSustituto(
+                alimento=AlimentoRead.model_validate(alimento),
+                similitud=float(similitud),
+            )
+        )
+    return resultado

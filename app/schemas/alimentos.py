@@ -25,3 +25,8 @@ class AlimentoNombreId(BaseModel):
     id: int
     alimento: str
     model_config = ConfigDict(from_attributes=True)
+
+
+class AlimentoSustituto(BaseModel):
+    alimento: AlimentoRead
+    similitud: float

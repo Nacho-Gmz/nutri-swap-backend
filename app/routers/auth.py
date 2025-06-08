@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
-from app.crud_fastapi import UsuarioCreate
 from app.models.usuarios import Usuario
 from app.schemas.auth import LoginUsuario, Token
+from app.schemas.usuarios import UsuarioCreate, UsuarioRead
 from app.utils import (
     hash_password,
     verify_password,
@@ -12,6 +12,32 @@ from app.utils import (
 )
 
 router = APIRouter()
+
+
+@router.post("/signup", response_model=UsuarioRead)
+def crear_usuario(
+    usuario_data: UsuarioCreate,
+    db: Session = Depends(get_db),
+):
+    existing_user = (
+        db.query(Usuario).filter(Usuario.correo == usuario_data.correo).first()
+    )
+    if existing_user:
+        raise HTTPException(status_code=400, detail="⚠️ Correo ya registrado.")
+
+    hashed_pass = hash_password(usuario_data.contraseña)
+
+    new_user = Usuario(
+        nombre=usuario_data.nombre,
+        apellidos=usuario_data.apellidos,
+        correo=usuario_data.correo,
+        contraseña=hashed_pass,
+        activo=True,
+    )
+    db.add(new_user)
+    db.commit()
+    db.refresh(new_user)
+    return new_user
 
 
 @router.post("/login", response_model=Token)

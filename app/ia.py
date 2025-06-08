@@ -27,5 +27,18 @@ def obtener_sustitutos_ordenados(alimento_obj, lista_alimentos, n_clusters=5):
     # Paso 5: Ordenar por distancia (menor = más parecido)
     candidatos_ordenados = sorted(candidatos, key=lambda x: x[1])
 
-    # Paso 6: Retornar solo la lista de objetos Alimento ordenados
-    return [alimento for alimento, _ in candidatos_ordenados]
+    # Paso 6: Calcular distancia máxima para normalizar
+    if candidatos_ordenados:
+        max_distancia = max([dist for _, dist in candidatos_ordenados])
+    else:
+        max_distancia = 1  # evitar división por cero
+
+    # Paso 7: Retornar lista de tuplas (alimento, porcentaje_similitud)
+    resultado = []
+    for alimento, distancia in candidatos_ordenados:
+        if max_distancia == 0:
+            porcentaje = 100.0
+        else:
+            porcentaje = 100 * (1 - (distancia / max_distancia))
+        resultado.append((alimento, porcentaje))
+    return resultado
