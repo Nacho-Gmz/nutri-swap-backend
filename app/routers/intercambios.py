@@ -1,6 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
-from app.database import SessionLocal
 from app.models.intercambios import Intercambio
 from app.models.usuarios import Usuario
 from app.schemas.intercambios import IntercambioBase
@@ -23,7 +22,14 @@ def obtener_intercambios(
       - page: página actual
       - pages: total de páginas
     """
-    return db.query(Intercambio).filter_by(usuario_id=current_user.id).all()
+    intercambios_usuario = (
+        db.query(Intercambio).filter_by(usuario_id=current_user.id).all()
+    )
+
+    if not intercambios_usuario:
+        raise HTTPException(status_code=404, detail="No cuenta con intercambios.")
+
+    return intercambios_usuario
 
 
 # Crear un nuevo intercambio
@@ -40,9 +46,9 @@ def crear_intercambio(
       - usuario_id
     """
     intercambio = Intercambio(
-        alimento_original_id=intercambio_data.alimento_original_id,
-        alimento_intercambiado_id=intercambio_data.alimento_intercambiado_id,
-        usuario_id=current_user.id,
+        original_food_id=intercambio_data.original_food_id,
+        swapped_food_id=intercambio_data.swapped_food_id,
+        user_id=current_user.id,
     )
     db.add(intercambio)
     db.commit()

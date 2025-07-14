@@ -3,16 +3,16 @@ from datetime import datetime
 
 
 class AlimentoBase(BaseModel):
-    alimento: str
-    categoria: str
-    cantidad: float
-    unidad: str
-    peso_bruto: float
-    peso_neto: float
-    energia: float
-    proteinas: float
-    lipidos: float
-    carbohidratos: float
+    name: str
+    category: str
+    quantity: float
+    unit: str
+    gross_weight: float
+    net_weight: float
+    calories: float
+    protein: float
+    lipids: float
+    carbohydrates: float
 
 
 class AlimentoRead(AlimentoBase):
@@ -23,7 +23,7 @@ class AlimentoRead(AlimentoBase):
 
 class AlimentoNombreId(BaseModel):
     id: int
-    alimento: str
+    name: str
     model_config = ConfigDict(from_attributes=True)
 
 

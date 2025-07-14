@@ -22,22 +22,22 @@ def crear_alimento(
     db: Session = Depends(get_db),
 ):
     aliemento_existente = (
-        db.query(Alimento).filter(Alimento.alimento == alimento_data.alimento).first()
+        db.query(Alimento).filter(Alimento.alimento == alimento_data.name).first()
     )
     if aliemento_existente:
         raise HTTPException(status_code=400, detail="⚠️ Alimento ya registrado.")
 
     nuevo_alimento = Alimento(
-        alimento=alimento_data.alimento,
-        categoria=alimento_data.categoria,
-        cantidad=alimento_data.cantidad,
-        unidad=alimento_data.unidad,
-        peso_bruto=alimento_data.peso_bruto,
-        peso_neto=alimento_data.peso_neto,
-        energia=alimento_data.energia,
-        proteinas=alimento_data.proteinas,
-        lipidos=alimento_data.lipidos,
-        carbohidratos=alimento_data.carbohidratos,
+        alimento=alimento_data.name,
+        categoria=alimento_data.category,
+        cantidad=alimento_data.quantity,
+        unidad=alimento_data.unit,
+        peso_bruto=alimento_data.gross_weight,
+        peso_neto=alimento_data.net_weight,
+        energia=alimento_data.calories,
+        proteinas=alimento_data.protein,
+        lipidos=alimento_data.lipids,
+        carbohidratos=alimento_data.carbohydrates,
         created_at=alimento_data.created_at,
         updated_at=alimento_data.updated_at,
     )
@@ -59,7 +59,7 @@ def obtener_todos_alimentos(db: Session = Depends(get_db)):
 # Obtener nombres de todos los alimentos
 @router.get("/nombres", response_model=List[AlimentoNombreId])
 def obtener_nombres_alimentos(db: Session = Depends(get_db)):
-    nombres = db.query(Alimento.id, Alimento.alimento).all()
+    nombres = db.query(Alimento.id, Alimento.name).all()
     if not nombres:
         raise HTTPException(status_code=404, detail="Alimentos no encontrados")
     # Extraer solo los nombres de la lista de tuplas
@@ -106,16 +106,16 @@ def actualizar_alimento(
     alimento = db.query(Alimento).filter(Alimento.id == id).first()
     if not alimento:
         raise HTTPException(status_code=404, detail="Alimento no encontrado")
-    alimento.alimento = datos_actualizados.alimento
-    alimento.categoria = datos_actualizados.categoria
-    alimento.cantidad = datos_actualizados.cantidad
-    alimento.unidad = datos_actualizados.unidad
-    alimento.peso_bruto = datos_actualizados.peso_bruto
-    alimento.peso_neto = datos_actualizados.peso_neto
-    alimento.energia = datos_actualizados.energia
-    alimento.proteinas = datos_actualizados.proteinas
-    alimento.lipidos = datos_actualizados.lipidos
-    alimento.carbohidratos = datos_actualizados.carbohidratos
+    alimento.name = datos_actualizados.name
+    alimento.category = datos_actualizados.category
+    alimento.quantity = datos_actualizados.quantity
+    alimento.unit = datos_actualizados.unit
+    alimento.gross_weight = datos_actualizados.gross_weight
+    alimento.net_weight = datos_actualizados.net_weight
+    alimento.calories = datos_actualizados.calories
+    alimento.protein = datos_actualizados.protein
+    alimento.lipids = datos_actualizados.lipids
+    alimento.carbohydrates = datos_actualizados.carbohydrates
     alimento.updated_at = datos_actualizados.updated_at
 
     db.commit()

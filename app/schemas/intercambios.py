@@ -1,6 +1,6 @@
-from pydantic import ConfigDict, BaseModel
+from pydantic import BaseModel
 
 
 class IntercambioBase(BaseModel):
-    alimento_original_id: int
-    alimento_intercambiado_id: int
+    original_food_id: int
+    swapped_food_id: int

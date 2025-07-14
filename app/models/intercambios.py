@@ -7,18 +7,14 @@ class Intercambio(Base):
     __tablename__ = "intercambios"
 
     id = Column(Integer, primary_key=True, index=True)
-    alimento_original_id = Column(ForeignKey("alimentos.id"), nullable=False)
-    alimento_intercambiado_id = Column(ForeignKey("alimentos.id"), nullable=False)
-    usuario_id = Column(ForeignKey("usuarios.id"), nullable=False)
+    original_food_id = Column(ForeignKey("alimentos.id"), nullable=False)
+    swapped_food_id = Column(ForeignKey("alimentos.id"), nullable=False)
+    user_id = Column(ForeignKey("usuarios.id"), nullable=False)
     created_at = Column(DateTime(timezone=True), server_default=func.now())
 
     # Relación con alimentos
-    alimento_original = relationship("Alimento", foreign_keys=[alimento_original_id])
-    alimento_intercambiado = relationship(
-        "Alimento", foreign_keys=[alimento_intercambiado_id]
-    )
+    original_food = relationship("Alimento", foreign_keys=[original_food_id])
+    swapped_food = relationship("Alimento", foreign_keys=[swapped_food_id])
 
     # Relación con usuario
-    usuario = relationship(
-        "Usuario", back_populates="intercambios", foreign_keys=[usuario_id]
-    )
+    user = relationship("Usuario", back_populates="swaps", foreign_keys=[user_id])
