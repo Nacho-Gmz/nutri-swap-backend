@@ -7,11 +7,11 @@ from app.utils import (
     hash_password,
     verify_password,
     create_access_token,
-    get_db,
     validate_user,
 )
+from app.database import get_db
 
-router = APIRouter()
+router = APIRouter(prefix="/auth")
 
 
 @router.post("/signup", response_model=UsuarioRead)

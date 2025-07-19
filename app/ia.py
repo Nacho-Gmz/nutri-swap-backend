@@ -5,7 +5,7 @@ import numpy as np
 def obtener_sustitutos_ordenados(alimento_obj, lista_alimentos, n_clusters=5):
     # Paso 1: Crear matriz nutricional
     datos_nutricionales = np.array(
-        [[a.energia, a.proteinas, a.lipidos, a.carbohidratos] for a in lista_alimentos]
+        [[a.calories, a.protein, a.lipids, a.carbohydrates] for a in lista_alimentos]
     )
 
     # Paso 2: Aplicar K-Means

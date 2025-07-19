@@ -9,10 +9,10 @@ from app.schemas.alimentos import (
     AlimentoBase,
     AlimentoSustituto,
 )
-from app.utils import get_db
+from app.database import get_db
 from app.ia import obtener_sustitutos_ordenados
 
-router = APIRouter()
+router = APIRouter(prefix="/alimentos")
 
 
 # Crear un nuevo alimento
@@ -131,7 +131,7 @@ def obtener_alimentos_misma_categoria(id: str, db: Session = Depends(get_db)):
         raise HTTPException(status_code=404, detail="Alimento no encontrado")
     alimentos = (
         db.query(Alimento)
-        .filter(Alimento.categoria == alimento_base.categoria, Alimento.id != id)
+        .filter(Alimento.category == alimento_base.category, Alimento.id != id)
         .all()
     )
     return alimentos
@@ -143,7 +143,7 @@ def obtener_alimentos_ia(id: str, db: Session = Depends(get_db)):
     if not alimento_base:
         raise HTTPException(status_code=404, detail="Alimento no encontrado")
     alimentos = (
-        db.query(Alimento).filter(Alimento.categoria == alimento_base.categoria).all()
+        db.query(Alimento).filter(Alimento.category == alimento_base.category).all()
     )
     lista_aliementos = obtener_sustitutos_ordenados(alimento_base, alimentos)
     resultado = []

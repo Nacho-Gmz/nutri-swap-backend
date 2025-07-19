@@ -16,10 +16,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-app.include_router(auth.router, prefix="/auth", tags=["Autenticacion"])
-app.include_router(usuarios.router, prefix="/usuarios", tags=["Usuarios"])
-app.include_router(alimentos.router, prefix="/alimentos", tags=["Alimentos"])
-app.include_router(intercambios.router, prefix="/intercambios", tags=["Intercambios"])
+app.include_router(auth.router, tags=["Autenticacion"])
+app.include_router(usuarios.router, tags=["Usuarios"])
+app.include_router(alimentos.router, tags=["Alimentos"])
+app.include_router(intercambios.router, tags=["Intercambios"])
 
 
 @app.get("/")

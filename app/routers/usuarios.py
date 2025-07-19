@@ -4,9 +4,10 @@ from typing import List
 
 from app.models.usuarios import Usuario
 from app.schemas.usuarios import UsuarioCreate, UsuarioRead
-from app.utils import hash_password, get_db, validate_user
+from app.utils import hash_password, validate_user
+from app.database import get_db
 
-router = APIRouter()
+router = APIRouter(prefix="/usuarios")
 
 
 @router.post("/", response_model=UsuarioRead)

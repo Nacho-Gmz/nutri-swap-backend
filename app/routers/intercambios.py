@@ -3,9 +3,10 @@ from sqlalchemy.orm import Session
 from app.models.intercambios import Intercambio
 from app.models.usuarios import Usuario
 from app.schemas.intercambios import IntercambioBase
-from app.utils import validate_user, get_db
+from app.utils import validate_user
+from app.database import get_db
 
-router = APIRouter()
+router = APIRouter(prefix="/intercambios")
 
 
 @router.get("/{id}")
