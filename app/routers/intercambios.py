@@ -24,7 +24,7 @@ def obtener_intercambios(
       - pages: total de páginas
     """
     intercambios_usuario = (
-        db.query(Intercambio).filter_by(usuario_id=current_user.id).all()
+        db.query(Intercambio).filter_by(user_id=current_user.id).all()
     )
 
     if not intercambios_usuario:
