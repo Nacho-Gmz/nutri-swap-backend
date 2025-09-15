@@ -3,8 +3,10 @@ from sqlalchemy.orm import Session
 from app.models.intercambios import Intercambio
 from app.models.usuarios import Usuario
 from app.schemas.intercambios import IntercambioBase
+
 from app.utils import validate_user
 from app.database import get_db
+from app.schemas.intercambios_read import IntercambioAlimentosRead
 
 router = APIRouter(prefix="/intercambios")
 
@@ -17,11 +19,7 @@ def obtener_intercambios(
     current_user: Usuario = Depends(validate_user),
 ):
     """
-    Retorna un objeto JSON con:
-      - intercambios: lista de intercambios
-      - total: total de intercambios
-      - page: página actual
-      - pages: total de páginas
+    Retorna un array de objetos con los alimentos originales e intercambiados (id, name)
     """
     intercambios_usuario = (
         db.query(Intercambio).filter_by(user_id=current_user.id).all()
@@ -30,7 +28,17 @@ def obtener_intercambios(
     if not intercambios_usuario:
         raise HTTPException(status_code=404, detail="No cuenta con intercambios.")
 
-    return intercambios_usuario
+    resultado = []
+    for intercambio in intercambios_usuario:
+        original = intercambio.original_food
+        swapped = intercambio.swapped_food
+        resultado.append(
+            {
+                "original_food": {"id": original.id, "name": original.name},
+                "swapped_food": {"id": swapped.id, "name": swapped.name},
+            }
+        )
+    return resultado
 
 
 # Crear un nuevo intercambio

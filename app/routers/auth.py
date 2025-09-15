@@ -55,7 +55,13 @@ def login(user_credentials: LoginUsuario, db: Session = Depends(get_db)):
             detail="Correo o contraseña no válidos.",
         )
 
-    access_token = create_access_token({"user_id": user.id, "email": user.email})
+    access_token = create_access_token(
+        {
+            "user_id": user.id,
+            "email": user.email,
+            "name": user.firstName,
+        }
+    )
 
     return Token(access_token=access_token)
 
@@ -63,6 +69,10 @@ def login(user_credentials: LoginUsuario, db: Session = Depends(get_db)):
 @router.post("/refresh-token", response_model=Token)
 def refresh_token(current_user: Usuario = Depends(validate_user)):
     access_token = create_access_token(
-        {"user_id": current_user.id, "email": current_user.email}
+        {
+            "user_id": current_user.id,
+            "email": current_user.email,
+            "name": current_user.firstName,
+        }
     )
     return Token(access_token=access_token)
