@@ -25,6 +25,12 @@ def crear_usuario(
     if existing_user:
         raise HTTPException(status_code=400, detail="⚠️ Correo ya registrado.")
 
+    print("--- INICIO DEPURACIÓN ---")
+    print(f"Tipo de 'usuario_data.password': {type(usuario_data.password)}")
+    print(f"Valor de 'usuario_data.password': {usuario_data.password}")
+    print(f"Longitud de 'usuario_data.password': {len(usuario_data.password)}")
+    print("--- FIN DEPURACIÓN ---")
+
     hashed_pass = hash_password(usuario_data.password)
 
     new_user = Usuario(
